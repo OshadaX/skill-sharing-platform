@@ -1,4 +1,4 @@
-package com.skillsharing.backend;
+package com.skillsharing.backend.learningplans;
 
 import org.springframework.stereotype.Service;
 import org.springframework.http.ResponseEntity;

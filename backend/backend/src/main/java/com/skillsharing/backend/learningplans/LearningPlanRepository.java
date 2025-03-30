@@ -1,4 +1,4 @@
-package com.skillsharing.backend;
+package com.skillsharing.backend.learningplans;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

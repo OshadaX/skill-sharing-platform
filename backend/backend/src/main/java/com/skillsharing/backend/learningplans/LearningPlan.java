@@ -1,4 +1,4 @@
-package com.skillsharing.backend;
+package com.skillsharing.backend.learningplans;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
