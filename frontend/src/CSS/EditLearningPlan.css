@@ -1,0 +1,17 @@
+/* src/CSS/EditLearningPlan.css */
+.edit-learning-plan-container {
+    margin-top: 50px;
+    padding: 20px;
+  }
+  
+  .edit-learning-plan-form {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .edit-learning-plan-button {
+    margin-top: 20px;
+    background-color: #28a745;
+    color: white;
+  }
+  
