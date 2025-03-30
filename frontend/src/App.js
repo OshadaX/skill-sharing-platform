@@ -1,25 +1,40 @@
 // src/App.js
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import Layout from './pages/Layout';
 import Home from './pages/Home';
 import CreateLearningPlan from './pages/CreateLearningPlan';
-import EditLearningPlan from './pages/EditLearningPlan';
-import ViewLearningPlan from './pages/ViewLearningPlan';
+import NotFound from './pages/NotFound';
 import './App.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/600.css';
+import '@fontsource/inter/700.css';
+
+const router = createBrowserRouter(
+  [
+    {
+      path: "/",
+      element: <Layout />,
+      children: [
+        { index: true, element: <Home /> },
+        { path: "create", element: <CreateLearningPlan /> },
+        { path: "home", element: <Home /> },
+        { path: "*", element: <NotFound /> },
+      ],
+    },
+  ],
+  {
+    future: {
+      v7_startTransition: true,
+      v7_relativeSplatPath: true,
+    },
+  }
+);
 
 function App() {
-  return (
-    <Router>
-      <div className="App">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/create" element={<CreateLearningPlan />} />
-          <Route path="/edit-learning-plan/:id" element={<EditLearningPlan />} />
-          <Route path="/learning-plan/:id" element={<ViewLearningPlan />} />
-        </Routes>
-      </div>
-    </Router>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;

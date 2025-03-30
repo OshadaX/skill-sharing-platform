@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../CSS/CreateLearningPlan.css';
+import '../OshadaCss/CreateLearningPlan.css';
 
 const CreateLearningPlan = () => {
   const [formData, setFormData] = useState({
@@ -8,10 +8,14 @@ const CreateLearningPlan = () => {
     description: '',
     startDate: '',
     endDate: '',
-    assignedTo: ''
+    assignedTo: '',
+    category: 'professional',
+    priority: 'medium',
+    status: 'PLANNED'
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -24,42 +28,53 @@ const CreateLearningPlan = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate form data
+    const newErrors = {};
+    if (formData.title.length < 3) newErrors.title = 'Title must be at least 3 characters long';
+    if (formData.description.length < 10) newErrors.description = 'Description must be at least 10 characters long';
+    if (!formData.startDate) newErrors.startDate = 'Start date is required';
+    if (!formData.endDate) newErrors.endDate = 'End date is required';
+    if (!formData.assignedTo) newErrors.assignedTo = 'Assigned to is required';
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
     setIsSubmitting(true);
     setMessage({ text: '', type: '' });
 
     try {
-      const response = await fetch('/api/learning-plans', {
+      const response = await fetch('http://localhost:8080/api/learning-plans', {
         method: 'POST',
+        mode: 'cors',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          ...formData,
+          startDate: new Date(formData.startDate).toISOString(),
+          endDate: new Date(formData.endDate).toISOString()
+        })
       });
 
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        const errorData = await response.json();
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
       setMessage({ 
-        text: data.message || 'Learning plan created successfully!', 
+        text: `Learning plan "${data.title}" created successfully!`, 
         type: 'success' 
       });
       
-      // Reset form and redirect after 2 seconds
-      setTimeout(() => {
-        setFormData({
-          title: '',
-          description: '',
-          startDate: '',
-          endDate: '',
-          assignedTo: ''
-        });
-        navigate('/');
-      }, 2000);
+      setTimeout(() => navigate('/'), 2000);
     } catch (error) {
+      console.error('Creation error:', error);
       setMessage({ 
-        text: `Error creating learning plan: ${error.message}`, 
+        text: error.message || 'Failed to create plan. Please check console for details.', 
         type: 'error' 
       });
     } finally {
@@ -68,81 +83,169 @@ const CreateLearningPlan = () => {
   };
 
   return (
-    <div className="create-plan-container">
-      <div className="create-plan-card">
-        <header className="create-plan-header">
-          <h1>Create New Learning Plan</h1>
-          <p>Fill out the form to create a structured learning path</p>
-        </header>
-
-        <form onSubmit={handleSubmit} className="create-plan-form">
-          <div className="form-group">
-            <label htmlFor="title">Title</label>
-            <input
-              id="title"
-              type="text"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              placeholder="Enter plan title"
-              required
-            />
+    <div className="form-container">
+      <div className="form-card">
+        <div className="form-header">
+          <div className="form-icon">
+            <i className="fas fa-book-open"></i>
           </div>
-
-          <div className="form-group">
-            <label htmlFor="description">Description</label>
-            <textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              placeholder="Describe the learning objectives"
-              rows="4"
-              required
-            />
+          <div>
+            <h1>Create Learning Path</h1>
+            <p>Design a structured roadmap for your learning journey</p>
           </div>
+        </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="startDate">Start Date</label>
-              <input
-                id="startDate"
-                type="date"
-                name="startDate"
-                value={formData.startDate}
-                onChange={handleChange}
-                required
-              />
+        <form onSubmit={handleSubmit} className="learning-form">
+          <div className="form-section">
+            <h3>Basic Information</h3>
+            <div className="form-grid">
+              <div className="form-group">
+                <label htmlFor="title">Plan Title*</label>
+                <input
+                  id="title"
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  placeholder="e.g. React Mastery Program"
+                  className={errors.title ? 'error' : ''}
+                  required
+                />
+                {errors.title && <span className="error-message">{errors.title}</span>}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="category">Category*</label>
+                <select
+                  id="category"
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="professional">Professional Development</option>
+                  <option value="technical">Technical Skills</option>
+                  <option value="language">Language Learning</option>
+                  <option value="personal">Personal Growth</option>
+                </select>
+              </div>
             </div>
 
             <div className="form-group">
-              <label htmlFor="endDate">End Date</label>
-              <input
-                id="endDate"
-                type="date"
-                name="endDate"
-                value={formData.endDate}
+              <label htmlFor="description">Description*</label>
+              <textarea
+                id="description"
+                name="description"
+                value={formData.description}
                 onChange={handleChange}
+                placeholder="Describe the learning objectives, key topics, and expected outcomes"
+                rows="5"
+                className={errors.description ? 'error' : ''}
                 required
-                min={formData.startDate}
               />
+              {errors.description && <span className="error-message">{errors.description}</span>}
             </div>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="assignedTo">Assigned To</label>
-            <input
-              id="assignedTo"
-              type="text"
-              name="assignedTo"
-              value={formData.assignedTo}
-              onChange={handleChange}
-              placeholder="Enter assignee name or email"
-              required
-            />
+          <div className="form-section">
+            <h3>Timeline</h3>
+            <div className="form-grid">
+              <div className="form-group">
+                <label htmlFor="startDate">Start Date*</label>
+                <div className="date-input">
+                  <i className="fas fa-calendar-alt"></i>
+                  <input
+                    id="startDate"
+                    type="date"
+                    name="startDate"
+                    value={formData.startDate}
+                    onChange={handleChange}
+                    className={errors.startDate ? 'error' : ''}
+                    required
+                  />
+                </div>
+                {errors.startDate && <span className="error-message">{errors.startDate}</span>}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="endDate">End Date*</label>
+                <div className="date-input">
+                  <i className="fas fa-calendar-alt"></i>
+                  <input
+                    id="endDate"
+                    type="date"
+                    name="endDate"
+                    value={formData.endDate}
+                    onChange={handleChange}
+                    min={formData.startDate}
+                    className={errors.endDate ? 'error' : ''}
+                    required
+                  />
+                </div>
+                {errors.endDate && <span className="error-message">{errors.endDate}</span>}
+              </div>
+            </div>
+          </div>
+
+          <div className="form-section">
+            <h3>Additional Details</h3>
+            <div className="form-grid">
+              <div className="form-group">
+                <label htmlFor="assignedTo">Assigned To*</label>
+                <div className="input-with-icon">
+                  <i className="fas fa-user"></i>
+                  <input
+                    id="assignedTo"
+                    type="text"
+                    name="assignedTo"
+                    value={formData.assignedTo}
+                    onChange={handleChange}
+                    placeholder="Enter name or email"
+                    className={errors.assignedTo ? 'error' : ''}
+                    required
+                  />
+                </div>
+                {errors.assignedTo && <span className="error-message">{errors.assignedTo}</span>}
+              </div>
+
+              <div className="form-group">
+                <label>Priority*</label>
+                <div className="priority-selector">
+                  <button
+                    type="button"
+                    className={`priority-btn ${formData.priority === 'low' ? 'active' : ''}`}
+                    onClick={() => setFormData({...formData, priority: 'low'})}
+                  >
+                    Low
+                  </button>
+                  <button
+                    type="button"
+                    className={`priority-btn ${formData.priority === 'medium' ? 'active' : ''}`}
+                    onClick={() => setFormData({...formData, priority: 'medium'})}
+                  >
+                    Medium
+                  </button>
+                  <button
+                    type="button"
+                    className={`priority-btn ${formData.priority === 'high' ? 'active' : ''}`}
+                    onClick={() => setFormData({...formData, priority: 'high'})}
+                  >
+                    High
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="form-actions">
+            <button 
+              type="button" 
+              className="btn-secondary"
+              onClick={() => navigate('/')}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </button>
             <button 
               type="submit" 
               className="btn-primary"
@@ -153,7 +256,9 @@ const CreateLearningPlan = () => {
                   <span className="spinner"></span> Creating...
                 </>
               ) : (
-                'Create Learning Plan'
+                <>
+                  <i className="fas fa-plus"></i> Create Plan
+                </>
               )}
             </button>
           </div>
@@ -161,6 +266,7 @@ const CreateLearningPlan = () => {
 
         {message.text && (
           <div className={`message ${message.type}`}>
+            <i className={`fas ${message.type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}`}></i>
             {message.text}
           </div>
         )}
