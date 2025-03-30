@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import CreateLearningPlan from './pages/CreateLearningPlan';
 import EditLearningPlan from './pages/EditLearningPlan';
 import ViewLearningPlan from './pages/ViewLearningPlan';
+import './App.css';
 
 function App() {
   return (

@@ -16,12 +16,20 @@ public class LearningPlan {
     private LocalDate endDate;
     private String assignedTo;
 
+    // Default constructor
+    public LearningPlan() {}
+
     public LearningPlan(String title, String description, LocalDate startDate, LocalDate endDate, String assignedTo) {
         this.title = title;
         this.description = description;
         this.startDate = startDate;
         this.endDate = endDate;
         this.assignedTo = assignedTo;
+    }
+
+    // Getters
+    public Long getId() {
+        return id;
     }
 
     public String getTitle() {
@@ -44,7 +52,24 @@ public class LearningPlan {
         return assignedTo;
     }
 
-    public Long getId() {
-        return id;
+    // Setters
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public void setAssignedTo(String assignedTo) {
+        this.assignedTo = assignedTo;
     }
 }
