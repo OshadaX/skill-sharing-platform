@@ -6,12 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.oshada.learningplan.repository.PostRepository;
 import java.util.List;
 import java.util.Optional;
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/learning-plans")
 public class LearningPlanController {
+
+    @Autowired
+    private PostRepository postRepository;
 
     @Autowired
     private LearningPlanRepository learningPlanRepository;
