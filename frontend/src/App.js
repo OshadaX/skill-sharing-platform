@@ -36,7 +36,7 @@ function App() {
   const fetchLearningPlans = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('http://localhost:8080/api/learning-plans');
+      const response = await fetch('http://localhost:8080/learningplans');
       if (!response.ok) throw new Error('Failed to fetch learning plans');
       const data = await response.json();
       setLearningPlans(data);
@@ -52,7 +52,7 @@ function App() {
     if (!newPlan.title.trim()) return;
     
     try {
-      const response = await fetch('http://localhost:8080/api/learning-plans', {
+      const response = await fetch('http://localhost:8080/learningplans', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newPlan),
@@ -76,7 +76,7 @@ function App() {
 
   const updateLearningPlan = async (id) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/learning-plans/${id}`, {
+      const response = await fetch(`http://localhost:8080/learningplans/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedPlan),
@@ -100,7 +100,7 @@ function App() {
 
   const deleteLearningPlan = async (id) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/learning-plans/${id}`, {
+      const response = await fetch(`http://localhost:8080/learningplans/${id}`, {
         method: 'DELETE',
       });
       
@@ -114,7 +114,7 @@ function App() {
 
   const togglePlanStatus = async (id, currentStatus) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/learning-plans/${id}`, {
+      const response = await fetch(`http://localhost:8080/learningplans/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isCompleted: !currentStatus }),
