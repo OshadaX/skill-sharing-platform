@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import PostManager from './components/PostManager';
 
 function App() {
   const [learningPlans, setLearningPlans] = useState([]);
@@ -455,6 +456,7 @@ function App() {
       <footer className="app-footer">
         <p>© {new Date().getFullYear()} Learning Plan Manager. All rights reserved.</p>
       </footer>
+      <PostManager />
     </div>
   );
 }
