@@ -1,0 +1,154 @@
+.container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+  
+  .header-box {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  
+  .avatar {
+    background-color: #1976d2;
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 1rem;
+  }
+  
+  .main-title {
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 0.5rem;
+  }
+  
+  .subtitle {
+    color: #666;
+  }
+  
+  .form-paper {
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+  
+  .form-title {
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .rounded-input input {
+    border-radius: 8px;
+  }
+  
+  .task-title {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .task-box {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .task-input {
+    flex-grow: 1;
+  }
+  
+  .add-task-btn {
+    margin-top: 0.5rem;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+  
+  .btn-submit {
+    background-color: #1976d2;
+    color: white;
+    border-radius: 8px;
+  }
+  
+  .btn-cancel {
+    border-radius: 8px;
+  }
+  
+  .section-title {
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .empty-state {
+    padding: 2rem;
+    text-align: center;
+    background-color: #f5f5f5;
+    border-radius: 12px;
+  }
+  
+  .empty-text {
+    color: #666;
+  }
+  
+  .plan-card {
+    margin-bottom: 1.5rem;
+    border-radius: 12px;
+    padding: 1rem;
+  }
+  
+  .plan-item {
+    padding: 1rem;
+  }
+  
+  .plan-title {
+    font-weight: 600;
+  }
+  
+  .plan-deadline {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: #888;
+  }
+  
+  .plan-desc {
+    margin-top: 0.5rem;
+    color: #555;
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .progress-box {
+    padding: 1rem;
+  }
+  
+  .progress-label {
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+  
+  .progress-bar {
+    height: 10px;
+    border-radius: 5px;
+    margin-bottom: 0.5rem;
+  }
+  
+  .task-item.completed span {
+    text-decoration: line-through;
+    color: #888;
+  }
+  
