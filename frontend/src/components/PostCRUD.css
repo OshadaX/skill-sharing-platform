@@ -1,0 +1,145 @@
+:root {
+  --primary-color: #2962ff;
+  --secondary-color: #455a64;
+  --success-color: #00c853;
+  --error-color: #d32f2f;
+  --text-primary: #263238;
+  --text-secondary: #607d8b;
+  --background-light: #f9f9f9;
+  --border-color: #e0e0e0;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: var(--background-light);
+  margin: 0;
+  padding: 0;
+}
+
+.post-management-title {
+  color: var(--primary-color);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.form-input {
+  margin-bottom: 1.5rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.form-input input,
+.form-input textarea {
+  font-size: 1rem;
+  border-radius: 8px;
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+
+.form-input input:focus,
+.form-input textarea:focus {
+  border-color: var(--primary-color);
+  outline: none;
+}
+
+.form-button {
+  padding: 12px 24px;
+  font-weight: 600;
+  text-transform: uppercase;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.form-button:hover {
+  opacity: 0.9;
+}
+
+.post-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.post-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.post-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.post-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.video-container iframe {
+  width: 100%;
+  height: 200px;
+  border: none;
+  border-radius: 8px;
+}
+
+.post-description {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+.post-deadline,
+.post-price {
+  font-size: 1rem;
+  color: var(--secondary-color);
+}
+
+.post-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-top: 1px solid var(--border-color);
+  border-radius: 0 0 12px 12px;
+}
+
+.post-actions button {
+  font-weight: 600;
+}
+
+.post-actions .MuiIconButton-root {
+  transition: transform 0.2s ease;
+}
+
+.post-actions .MuiIconButton-root:hover {
+  transform: scale(1.1);
+}
+
+@media screen and (max-width: 768px) {
+  .post-management-title {
+    font-size: 1.2rem;
+  }
+
+  .form-input input,
+  .form-input textarea {
+    font-size: 0.9rem;
+  }
+
+  .post-title {
+    font-size: 1.2rem;
+  }
+
+  .post-description {
+    font-size: 0.9rem;
+  }
+}

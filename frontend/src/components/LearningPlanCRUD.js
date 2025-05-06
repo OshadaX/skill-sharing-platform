@@ -1,244 +1,327 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
-  Container, Typography, TextField, Button, List, ListItem, ListItemText,
-  ListItemSecondaryAction, IconButton, Paper, Checkbox, Divider,
-  Grid, LinearProgress, Box, Avatar
+  Card, CardContent, Typography, Button, Modal, TextField, Box, IconButton, LinearProgress,
+  Chip, MenuItem, Select, Tooltip, FormControl, InputLabel
 } from '@mui/material';
-import { Delete, Edit, Save, Add, Assignment, CalendarToday, Task } from '@mui/icons-material';
-import { format } from 'date-fns';
-import { Link } from 'react-router-dom';  // Import Link for navigation
+import { Delete, Add, Edit, PriorityHigh, LowPriority, BusinessCenter } from '@mui/icons-material';
 import './LearningPlanCRUD.css';
 
-function LearningPlanCRUD() {
+const LearningPlanCRUD = () => {
   const [plans, setPlans] = useState([]);
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    deadline: format(new Date(), 'yyyy-MM-dd'),
-    tasks: [{ description: '', isCompleted: false }]
+  const [newPlan, setNewPlan] = useState({ 
+    title: '', 
+    description: '', 
+    priority: 'medium',
+    tasks: [] 
   });
+  const [taskInputs, setTaskInputs] = useState(['']);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editMode, setEditMode] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
-  useEffect(() => { fetchPlans(); }, []);
-
-  const fetchPlans = async () => {
-    try {
-      const response = await fetch('http://localhost:8080/learningplans');
-      const data = await response.json();
-      setPlans(data);
-    } catch (error) {
-      console.error('Error fetching plans:', error);
-    }
+  const priorityStyles = {
+    high: { color: '#d32f2f', bgcolor: '#ffebee', icon: <PriorityHigh fontSize="small" /> },
+    medium: { color: '#ef6c00', bgcolor: '#fff3e0', icon: <BusinessCenter fontSize="small" /> },
+    low: { color: '#2e7d32', bgcolor: '#e8f5e9', icon: <LowPriority fontSize="small" /> }
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setNewPlan({ ...newPlan, [name]: value });
   };
 
-  const handleTaskChange = (index, field, value) => {
-    const updatedTasks = [...formData.tasks];
-    updatedTasks[index][field] = value;
-    setFormData({ ...formData, tasks: updatedTasks });
+  const handleTaskInputChange = (index, value) => {
+    const updatedTasks = [...taskInputs];
+    updatedTasks[index] = value;
+    setTaskInputs(updatedTasks);
   };
 
-  const addTask = () => {
-    setFormData({ ...formData, tasks: [...formData.tasks, { description: '', isCompleted: false }] });
+  const addTaskField = () => {
+    setTaskInputs([...taskInputs, '']);
   };
 
-  const removeTask = (index) => {
-    const updatedTasks = [...formData.tasks];
-    updatedTasks.splice(index, 1);
-    setFormData({ ...formData, tasks: updatedTasks });
-  };
+  const savePlan = () => {
+    const formattedTasks = taskInputs
+      .filter(task => task.trim() !== '')
+      .map(task => ({ description: task, isCompleted: false }));
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const url = editingId
-      ? `http://localhost:8080/learningplans/${editingId}`
-      : 'http://localhost:8080/learningplans';
-    const method = editingId ? 'PUT' : 'POST';
+    const planData = {
+      ...newPlan,
+      tasks: formattedTasks,
+      id: editMode ? editingId : plans.length + 1,
+      created: new Date().toISOString().split('T')[0]
+    };
 
-    try {
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-      await response.json();
-      fetchPlans();
-      resetForm();
-    } catch (error) {
-      console.error('Error:', error);
+    if (editMode) {
+      setPlans(plans.map(p => p.id === editingId ? planData : p));
+    } else {
+      setPlans([...plans, planData]);
     }
-  };
 
-  const deletePlan = async (id) => {
-    try {
-      await fetch(`http://localhost:8080/learningplans/${id}`, {
-        method: 'DELETE'
-      });
-      fetchPlans();
-    } catch (error) {
-      console.error('Error deleting plan:', error);
-    }
-  };
-
-  const editPlan = (plan) => {
-    setFormData({
-      title: plan.title,
-      description: plan.description,
-      deadline: plan.deadline,
-      tasks: plan.tasks || [{ description: '', isCompleted: false }]
-    });
-    setEditingId(plan.id);
+    setModalOpen(false);
+    resetForm();
   };
 
   const resetForm = () => {
-    setFormData({
-      title: '',
-      description: '',
-      deadline: format(new Date(), 'yyyy-MM-dd'),
-      tasks: [{ description: '', isCompleted: false }]
-    });
+    setNewPlan({ title: '', description: '', priority: 'medium', tasks: [] });
+    setTaskInputs(['']);
+    setEditMode(false);
     setEditingId(null);
   };
 
-  const calculateProgress = (tasks) => {
-    if (!tasks || tasks.length === 0) return 0;
-    const completed = tasks.filter(t => t.isCompleted).length;
-    return (completed / tasks.length) * 100;
+  const deletePlan = (id) => {
+    setPlans(plans.filter(plan => plan.id !== id));
   };
 
-  return (
-    <Container maxWidth="md" className="container">
-      <Box className="header-box">
-        <Avatar className="avatar"><Assignment /></Avatar>
-        <Typography variant="h3" className="main-title">Learning Plan Manager</Typography>
-        <Typography variant="subtitle1" className="subtitle">Organize, track, and achieve your learning goals</Typography>
-      </Box>
+  const toggleTask = (planId, taskIndex) => {
+    const updatedPlans = plans.map(plan => {
+      if (plan.id === planId) {
+        const updatedTasks = [...plan.tasks];
+        updatedTasks[taskIndex].isCompleted = !updatedTasks[taskIndex].isCompleted;
+        return { ...plan, tasks: updatedTasks };
+      }
+      return plan;
+    });
+    setPlans(updatedPlans);
+  };
 
-      <Paper className="form-paper">
-        <Typography variant="h5" className="form-title">
-          {editingId ? <Edit fontSize="small" /> : <Add fontSize="small" />}
-          {editingId ? 'Edit Learning Plan' : 'Create New Plan'}
+  const calculateProgress = (tasks) => {
+    if (tasks.length === 0) return 0;
+    const completed = tasks.filter(task => task.isCompleted).length;
+    return Math.round((completed / tasks.length) * 100);
+  };
+
+  const openCreateModal = () => {
+    resetForm();
+    setModalOpen(true);
+  };
+
+  const openEditModal = (plan) => {
+    setEditMode(true);
+    setEditingId(plan.id);
+    setNewPlan({ title: plan.title, description: plan.description, priority: plan.priority });
+    setTaskInputs(plan.tasks.map(t => t.description));
+    setModalOpen(true);
+  };
+
+  const PriorityChip = ({ priority }) => (
+    <Chip
+      label={priority}
+      size="small"
+      variant="outlined"
+      icon={priorityStyles[priority].icon}
+      sx={{ 
+        ml: 1,
+        color: priorityStyles[priority].color,
+        borderColor: priorityStyles[priority].color,
+        bgcolor: priorityStyles[priority].bgcolor
+      }}
+    />
+  );
+
+  const PlanCard = ({ plan }) => (
+    <Card className="plan-card" sx={{ position: 'relative', overflow: 'visible' }}>
+      <CardContent>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Box display="flex" alignItems="center">
+            <Typography variant="h6" component="div">{plan.title}</Typography>
+            <PriorityChip priority={plan.priority} />
+          </Box>
+          <Box>
+            <Tooltip title="Edit plan">
+              <IconButton onClick={() => openEditModal(plan)} size="small">
+                <Edit fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Delete plan">
+              <IconButton onClick={() => deletePlan(plan.id)} size="small">
+                <Delete fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        </Box>
+
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 1, mb: 2 }}>
+          {plan.description}
         </Typography>
 
-        <form onSubmit={handleSubmit}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth label="Plan Title" name="title" value={formData.title}
-                onChange={handleInputChange} variant="outlined" className="rounded-input"
+        <Box sx={{ mb: 2 }}>
+          {plan.tasks.map((task, idx) => (
+            <Box key={idx} className="task-item" sx={{ 
+              display: 'flex', 
+              alignItems: 'center',
+              py: 0.5,
+              '&:hover': { bgcolor: 'action.hover' }
+            }}>
+              <input
+                type="checkbox"
+                checked={task.isCompleted}
+                onChange={() => toggleTask(plan.id, idx)}
+                className="task-checkbox"
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth label="Deadline" type="date" name="deadline"
-                value={formData.deadline} onChange={handleInputChange}
-                InputLabelProps={{ shrink: true }} className="rounded-input"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth label="Description" name="description"
-                value={formData.description} onChange={handleInputChange}
-                multiline rows={3} variant="outlined" className="rounded-input"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="subtitle1" className="task-title"><Task fontSize="small" /> Tasks</Typography>
-              {formData.tasks.map((task, index) => (
-                <Box key={index} className="task-box">
-                  <Checkbox checked={task.isCompleted} onChange={(e) => handleTaskChange(index, 'isCompleted', e.target.checked)} color="primary" />
-                  <TextField
-                    fullWidth value={task.description}
-                    onChange={(e) => handleTaskChange(index, 'description', e.target.value)}
-                    placeholder="Task description" variant="standard" className="task-input"
-                    InputProps={{ disableUnderline: true }}
-                  />
-                  <IconButton onClick={() => removeTask(index)} color="error"><Delete /></IconButton>
-                </Box>
+              <span className={task.isCompleted ? 'completed' : ''}>
+                {task.description}
+              </span>
+            </Box>
+          ))}
+        </Box>
+
+        <Box sx={{ position: 'absolute', bottom: 16, left: 16, right: 16 }}>
+          <LinearProgress
+            variant="determinate"
+            value={calculateProgress(plan.tasks)}
+            sx={{ 
+              height: 8,
+              borderRadius: 4,
+              mb: 0.5,
+              '.MuiLinearProgress-bar': { borderRadius: 4 }
+            }}
+          />
+          <Box display="flex" justifyContent="space-between">
+            <Typography variant="caption" color="text.secondary">
+              Created: {plan.created}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {calculateProgress(plan.tasks)}% Complete
+            </Typography>
+          </Box>
+        </Box>
+      </CardContent>
+    </Card>
+  );
+
+  return (
+    <div className="container">
+      <Box sx={{ 
+        maxWidth: 1200, 
+        mx: 'auto', 
+        px: 3, 
+        py: 4,
+        backgroundColor: 'background.default'
+      }}>
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          mb: 4
+        }}>
+          <Typography variant="h4" component="h1" sx={{ fontWeight: 600 }}>
+            Learning Path Manager
+          </Typography>
+          <Button 
+            variant="contained" 
+            startIcon={<Add />} 
+            onClick={openCreateModal}
+            sx={{ borderRadius: 3, px: 3 }}
+          >
+            New Plan
+          </Button>
+        </Box>
+
+        <div className="card-grid">
+          {plans.map(plan => <PlanCard key={plan.id} plan={plan} />)}
+        </div>
+
+        <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+          <Box className="modal-style" sx={{ 
+            bgcolor: 'background.paper',
+            borderRadius: 2,
+            boxShadow: 24,
+            p: 4,
+            width: { xs: '90%', sm: 600 },
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)'
+          }}>
+            <Typography variant="h6" mb={3}>
+              {editMode ? 'Edit Learning Path' : 'Create New Learning Path'}
+            </Typography>
+            
+            <TextField
+              fullWidth
+              label="Title"
+              name="title"
+              value={newPlan.title}
+              onChange={handleInputChange}
+              margin="normal"
+              variant="outlined"
+              sx={{ mb: 2 }}
+            />
+            
+            <TextField
+              fullWidth
+              label="Description"
+              name="description"
+              value={newPlan.description}
+              onChange={handleInputChange}
+              margin="normal"
+              multiline
+              rows={3}
+              variant="outlined"
+              sx={{ mb: 2 }}
+            />
+
+            <FormControl fullWidth sx={{ mb: 2 }}>
+              <InputLabel>Priority</InputLabel>
+              <Select
+                value={newPlan.priority}
+                label="Priority"
+                onChange={(e) => setNewPlan({...newPlan, priority: e.target.value})}
+                variant="outlined"
+              >
+                <MenuItem value="high">High Priority</MenuItem>
+                <MenuItem value="medium">Medium Priority</MenuItem>
+                <MenuItem value="low">Low Priority</MenuItem>
+              </Select>
+            </FormControl>
+
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 600 }}>
+                Learning Tasks
+              </Typography>
+              {taskInputs.map((task, index) => (
+                <TextField
+                  key={index}
+                  fullWidth
+                  value={task}
+                  onChange={(e) => handleTaskInputChange(index, e.target.value)}
+                  margin="dense"
+                  placeholder={`Task ${index + 1}`}
+                  variant="outlined"
+                  sx={{ mb: 1 }}
+                />
               ))}
-              <Button startIcon={<Add />} onClick={addTask} variant="text" color="primary" className="add-task-btn">
+              <Button 
+                onClick={addTaskField} 
+                startIcon={<Add />}
+                sx={{ mt: 1 }}
+              >
                 Add Task
               </Button>
-            </Grid>
-            <Grid item xs={12} className="form-actions">
-              {editingId && (
-                <Button onClick={resetForm} variant="outlined" className="btn-cancel">Cancel</Button>
-              )}
-              <Button type="submit" variant="contained" startIcon={<Save />} className="btn-submit">
-                {editingId ? 'Update Plan' : 'Create Plan'}
-              </Button>
-            </Grid>
-          </Grid>
-        </form>
-      </Paper>
+            </Box>
 
-      <Box>
-        <Typography variant="h5" className="section-title"><Assignment fontSize="small" /> Your Learning Plans</Typography>
-        {plans.length === 0 ? (
-          <Paper className="empty-state">
-            <Typography variant="body1" className="empty-text">
-              No learning plans found. Start by creating your first plan!
-            </Typography>
-          </Paper>
-        ) : (
-          <List>
-            {plans.map((plan) => (
-              <Paper key={plan.id} className="plan-card">
-                <ListItem className="plan-item">
-                  <ListItemText
-                    primary={<Typography variant="h6" className="plan-title">{plan.title}</Typography>}
-                    secondary={
-                      <>
-                        <Typography variant="body2" className="plan-deadline">
-                          <CalendarToday fontSize="small" /> {format(new Date(plan.deadline), 'MMM dd, yyyy')}
-                        </Typography>
-                        {plan.description && (
-                          <Typography variant="body2" className="plan-desc">
-                            {plan.description}
-                          </Typography>
-                        )}
-                      </>
-                    }
-                  />
-                  <ListItemSecondaryAction className="action-buttons">
-                    <IconButton onClick={() => editPlan(plan)}><Edit /></IconButton>
-                    <IconButton onClick={() => deletePlan(plan.id)} color="error"><Delete /></IconButton>
-                    <Link to={`/learningplans/${plan.id}`}>
-                      <Button variant="contained" color="primary">More Details</Button>
-                    </Link>
-                  </ListItemSecondaryAction>
-                </ListItem>
-                {plan.tasks && plan.tasks.length > 0 && (
-                  <>
-                    <Divider />
-                    <Box className="progress-box">
-                      <Typography variant="subtitle2" className="progress-label">
-                        Progress ({Math.round(calculateProgress(plan.tasks))}%)
-                      </Typography>
-                      <LinearProgress variant="determinate" value={calculateProgress(plan.tasks)} className="progress-bar" />
-                      <List dense>
-                        {plan.tasks.map((task, idx) => (
-                          <ListItem key={idx}
-                           className={`task-item ${task.isCompleted ? 'completed' : ''}`}>
-                            <Checkbox edge="start" checked={task.isCompleted} disabled size="small" />
-                            <ListItemText primary={task.description} />
-                          </ListItem>
-                        ))}
-                      </List>
-                    </Box>
-                  </>
-                )}
-              </Paper>
-            ))}
-          </List>
-        )}
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+              <Button 
+                variant="outlined" 
+                onClick={() => setModalOpen(false)}
+                sx={{ borderRadius: 3, px: 3 }}
+              >
+                Cancel
+              </Button>
+              <Button 
+                variant="contained" 
+                onClick={savePlan}
+                sx={{ borderRadius: 3, px: 3 }}
+              >
+                {editMode ? 'Save Changes' : 'Create Plan'}
+              </Button>
+            </Box>
+          </Box>
+        </Modal>
       </Box>
-    </Container>
+    </div>
   );
-}
+};
 
 export default LearningPlanCRUD;
