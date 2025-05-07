@@ -1,4 +1,4 @@
-package com.oshada.learningplan;  // Same package as LearningplanApplication
+package com.oshada.learningplan.controller;  // Same package as LearningplanApplication
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
