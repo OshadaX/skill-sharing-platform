@@ -42,6 +42,7 @@ export default App;
 =======
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import PostManager from './components/PostManager';
 
 function App() {
   const [learningPlans, setLearningPlans] = useState([]);
@@ -497,9 +498,9 @@ function App() {
       <footer className="app-footer">
         <p>© {new Date().getFullYear()} Learning Plan Manager. All rights reserved.</p>
       </footer>
+      <PostManager />
     </div>
   );
 }
 
 export default App;
->>>>>>> 0ff9fcd164778cb2044874d37ef0ec54eaa67da1
