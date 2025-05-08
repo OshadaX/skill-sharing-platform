@@ -12,6 +12,9 @@ public class LearningPlan {
 
     private String title;
     private String description;
+    private String targetSkill;
+    private int progress = 0;
+    private String status;
     private LocalDate startDate;
     private LocalDate endDate;
     private String assignedTo;
@@ -22,6 +25,16 @@ public class LearningPlan {
     public LearningPlan(String title, String description, LocalDate startDate, LocalDate endDate, String assignedTo) {
         this.title = title;
         this.description = description;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.assignedTo = assignedTo;
+    }
+
+    public LearningPlan(String title, String description, String targetSkill, String status, LocalDate startDate, LocalDate endDate, String assignedTo) {
+        this.title = title;
+        this.description = description;
+        this.targetSkill = targetSkill;
+        this.status = status;
         this.startDate = startDate;
         this.endDate = endDate;
         this.assignedTo = assignedTo;
@@ -71,5 +84,29 @@ public class LearningPlan {
 
     public void setAssignedTo(String assignedTo) {
         this.assignedTo = assignedTo;
+    }
+
+    public String getTargetSkill() {
+        return targetSkill;
+    }
+
+    public void setTargetSkill(String targetSkill) {
+        this.targetSkill = targetSkill;
+    }
+
+    public int getProgress() {
+        return progress;
+    }
+
+    public void setProgress(int progress) {
+        this.progress = progress;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

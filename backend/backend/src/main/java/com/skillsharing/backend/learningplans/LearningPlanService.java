@@ -41,10 +41,13 @@ public class LearningPlanService {
             LearningPlan plan = existingPlan.get();
             plan.setTitle(updatedPlan.getTitle());
             plan.setDescription(updatedPlan.getDescription());
+            plan.setTargetSkill(updatedPlan.getTargetSkill());
+            plan.setProgress(updatedPlan.getProgress());
+            plan.setStatus(updatedPlan.getStatus());
             plan.setStartDate(updatedPlan.getStartDate());
             plan.setEndDate(updatedPlan.getEndDate());
             plan.setAssignedTo(updatedPlan.getAssignedTo());
-            return ResponseEntity.ok(repository.save(plan));  // Return updated plan with 200 OK
+            return ResponseEntity.ok(repository.save(plan));  // Save and return updated plan
         }
         return ResponseEntity.notFound().build();  // Return 404 if not found
     }

@@ -23,8 +23,11 @@ public class LearningPlanController {
 
     // Create a new learning plan
     @PostMapping
-    public LearningPlan createPlan(@RequestBody LearningPlan plan) {
-        return service.createPlan(plan);
+    public LearningPlan createPlan(@RequestBody LearningPlan plan,
+                                   @RequestParam String targetSkill,
+                                   @RequestParam String status) {
+        LearningPlan newPlan = new LearningPlan(plan.getTitle(), plan.getDescription(), targetSkill, status, plan.getStartDate(), plan.getEndDate(), plan.getAssignedTo());
+        return service.createPlan(newPlan);
     }
 
     // Get a single learning plan by ID
@@ -35,7 +38,12 @@ public class LearningPlanController {
 
     // Update a learning plan by ID
     @PutMapping("/{id}")
-    public ResponseEntity<LearningPlan> updatePlan(@PathVariable Long id, @RequestBody LearningPlan updatedPlan) {
+    public ResponseEntity<LearningPlan> updatePlan(@PathVariable Long id,
+                                                   @RequestBody LearningPlan updatedPlan,
+                                                   @RequestParam String targetSkill,
+                                                   @RequestParam String status) {
+        updatedPlan.setTargetSkill(targetSkill);
+        updatedPlan.setStatus(status);
         return service.updatePlan(id, updatedPlan);
     }
 
